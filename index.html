@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Making your first Phaser 3 Game - Part 10</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="text/javascript">
+
+        class Game extends Phaser.Scene {
+
+
+            preload() {
+                this.load.image('sky', 'assets/sky.png');
+                this.load.image('stone', 'assets/stone.png');
+                this.load.image('scissor', 'assets/scissor.png');
+                this.load.image('paper', 'assets/paper.png');
+            }
+
+            constructor() {
+                super('Game');
+                let scissor, stone, paper;
+                this.gameObjects = { scissor, stone, paper };
+                this.objectNumbers = 15;
+                //this.player;
+                //this.cursors;
+            }
+
+            create() {
+                var background = this.add.image(config.width / 2, config.height / 2, 'sky');                
+                background.displayWidth = config.width;
+                background.displayHeight = config.height;
+                this.physics.world.setBounds(100, 100, config.width - 200, config.width - 200);
+                this.gameObjects.scissor = this.physics.add.group({
+                    key: 'scissor',
+                    repeat: this.objectNumbers,
+                    setXY: { x: 200, y: 200, stepX: 20 },
+                    setScale: { x: 0.05, y: 0.05 }
+                });
+                this.gameObjects.scissor.children.iterate((child) => {
+                    let directions = [-1, 1];
+                    let directionIndex = Math.round(Math.random())
+                    child.setBounce(1);
+                    child.setCollideWorldBounds(true);
+                    child.setVelocity(Phaser.Math.Between(100, 200) * directions[directionIndex], Phaser.Math.Between(100, 200) * directions[directionIndex]);
+                    child.body.drag = 0;
+                    child.setData('name', 'scissor');
+                });
+
+                this.gameObjects.stone = this.physics.add.group({
+                    key: 'stone',
+                    repeat: this.objectNumbers,
+                    setXY: { x: config.width - 200, y: config.height - 200, stepX: -20 },
+                    setScale: { x: 0.05, y: 0.05 }
+                });
+                this.gameObjects.stone.children.iterate((child) => {
+                    let directions = [-1, 1];
+                    let directionIndex = Math.round(Math.random())
+                    child.setBounce(1);
+                    child.setCollideWorldBounds(true);
+                    child.setVelocity(Phaser.Math.Between(100, 200) * directions[directionIndex], Phaser.Math.Between(100, 200) * directions[directionIndex]);
+                    child.body.drag = 0;
+                    child.setData('name', 'stone');
+                });
+
+                this.gameObjects.paper = this.physics.add.group({
+                    key: 'paper',
+                    repeat: this.objectNumbers,
+                    setXY: { x: 200, y: config.height - 200, stepX: 20 },
+                    setScale: { x: 0.3, y: 0.3 }
+                });
+                this.gameObjects.paper.children.iterate((child) => {
+                    let directions = [-1, 1];
+                    let directionIndex = Math.round(Math.random())
+                    child.setBounce(1);
+                    child.setCollideWorldBounds(true);
+                    child.setVelocity(Phaser.Math.Between(100, 200) * directions[directionIndex], Phaser.Math.Between(100, 200) * directions[directionIndex]);
+                    child.body.drag = 0;
+                    child.setData('name', 'paper');
+                });
+
+                //this.cursors = this.input.keyboard.createCursorKeys();
+
+                // player = this.physics.add.sprite(500, 500, 'paper');
+                // gameObjects.paper.add(player, true);
+                // player.setData('name', 'paper');
+                // player.setData('isPlayer', true);
+                // player.setBounce(1);
+                // player.setCollideWorldBounds(true);
+                // player.setTexture('paper');
+                // player.setScale(0.3, 0.3);
+                // player.postFX.addGlow(0xffAAff, 4, 0, false, 0.1, 40);
+
+                this.drawBattleBorder();
+                this.physics.add.collider(this.gameObjects.stone, this.gameObjects.scissor, this.objectCollide, null, this)
+                this.physics.add.collider(this.gameObjects.stone, this.gameObjects.paper, this.objectCollide, null, this)
+                this.physics.add.collider(this.gameObjects.paper, this.gameObjects.scissor, this.objectCollide, null, this)
+
+            }
+
+            update() {
+                let isIdle = true;
+
+                // if (cursors.left.isDown) {
+                //     isIdle = false;
+                //     player.setVelocityX(-160);
+                // }
+
+                // if (cursors.right.isDown) {
+                //     isIdle = false;
+                //     player.setVelocityX(160);
+                // } 
+
+                // if(cursors.down.isDown) {
+                //     isIdle = false;
+                //     player.setVelocityY(160);
+                // } 
+
+                // if(cursors.up.isDown){
+                //     isIdle = false;
+                //     player.setVelocityY(-160);
+                // }
+
+                // if (isIdle){
+                //     player.setVelocity(0,0);
+                // }
+            }
+
+            objectCollide(objectA, objectB, info) {
+                let nameA = objectA.getData('name');
+                let nameB = objectB.getData('name')
+                let winner = this.calcDuelWinner(objectA.getData('name'), objectB.getData('name'))
+                if (winner === nameA) {
+                    this.replaceOldObject(objectB, objectA, this);
+                } else if (winner === nameB) {
+                    this.replaceOldObject(objectA, objectB, this);
+                }
+            }
+
+            replaceOldObject(loserObject, winnerObject, context) {
+                let winnerObjectName = winnerObject.getData('name');
+                let winnerObjectVelocity = winnerObject.body.velocity;
+                let createdObject = context.physics.add.sprite(loserObject.x + 10, loserObject.y + 10, winnerObjectName);
+                this.gameObjects[winnerObjectName].add(createdObject);
+                createdObject.setVelocity(loserObject.body.velocity.x, loserObject.body.velocity.y)
+                createdObject.setData('name', winnerObjectName);
+                createdObject.setTexture(winnerObjectName);
+                createdObject.setScale(winnerObject.scaleX, winnerObject.scaleY);
+                createdObject.setBounce(1);
+                createdObject.setCollideWorldBounds(true);
+                createdObject.body.drag = 0;
+                this.gameObjects[loserObject.getData("name")].remove(loserObject);
+                loserObject.destroy();
+
+                winnerObject.body.setVelocity(winnerObjectVelocity.x, winnerObjectVelocity.y);
+            }
+
+            calcDuelWinner(objectNameA, objectNameB) {
+                if (objectNameA === objectNameB)
+                    return 'draw'
+
+                if (objectNameA === 'scissor') {
+                    if (objectNameB === 'paper') {
+                        return 'scissor'
+                    } else {
+                        return 'stone'
+                    }
+                } else if (objectNameA === 'paper') {
+                    if (objectNameB === 'stone') {
+                        return 'paper'
+                    } else {
+                        return 'scissor'
+                    }
+                } else if (objectNameA === 'stone') {
+                    if (objectNameB === 'scissor') {
+                        return 'stone'
+                    } else {
+                        return 'paper'
+                    }
+                }
+
+                throw Error("Unknown object name")
+            }
+
+            drawBattleBorder() {
+                let rect = Phaser.Geom.Rectangle.Clone(this.cameras.main);
+                let { x, y, width, height } = rect;
+
+                
+                let battleBorder = this.add.rectangle(width / 2, height / 2, width - 200, height - 200);
+                battleBorder.setStrokeStyle(4,"0xFF0000");
+                this.syncWorldBounds(battleBorder);
+                this.tweens.add({
+                    targets: battleBorder,
+                    scale: 0.4,
+                    duration: 15000,
+                    ease: 'linear',
+                    onUpdate: (tween, target, param) =>{
+                        this.syncWorldBounds(target);
+                    }
+
+                });
+                this.physics.add.collider(battleBorder, this.gameObjects.scissor);
+                this.physics.add.collider(battleBorder, this.gameObjects.paper);
+                this.physics.add.collider(battleBorder, this.gameObjects.stone);
+            }
+
+            syncWorldBounds(battleBorder){
+                let rectRealBounds = battleBorder.getBounds();
+                this.physics.world.setBounds(rectRealBounds.x, rectRealBounds.y, rectRealBounds.width, rectRealBounds.height);
+            }
+
+        }
+
+
+
+        var config = {
+            type: Phaser.AUTO,
+            width: 1920,
+            height: 1080,
+            pixelArt: true,
+            debug: true,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0, x: 0 },
+                    debug: false
+                }
+            },
+            scale: {
+                mode: Phaser.Scale.FIT,
+            },
+            scene: [Game]
+        };
+        new Phaser.Game(config);
+
+    </script>
+</body>
+
+</html>
