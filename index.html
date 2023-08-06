@@ -27,23 +27,38 @@
 
             constructor() {
                 super('Game');
+                this.OBJECT_QUANTITY = 10;
                 let scissor, stone, paper;
                 this.gameObjects = { scissor, stone, paper };
-                this.objectNumbers = 15;
+                this.gameOver = false;
+                this.scissorScoreText;
+                this.stoneScoreText;
+                this.paperScoreText;
+                this.winnerName;
+                this.player;
                 //this.player;
                 //this.cursors;
             }
 
             create() {
-                var background = this.add.image(config.width / 2, config.height / 2, 'sky');                
+                var background = this.add.image(config.width / 2, config.height / 2, 'sky');
                 background.displayWidth = config.width;
                 background.displayHeight = config.height;
-                this.physics.world.setBounds(100, 100, config.width - 200, config.width - 200);
+
+                this.scissorScoreText = this.add.text(50, 2, "1", { fontFamily: 'Arial Black', fontSize: 20 });
+                this.stoneScoreText = this.add.text(50, 52, "1", { fontFamily: 'Arial Black', fontSize: 20 });
+                this.paperScoreText = this.add.text(50, 102, "1", { fontFamily: 'Arial Black', fontSize: 20 });
+
+                this.add.image(20, 14, 'scissor').setScale(0.05, 0.05);
+                this.add.image(20, 64, 'stone').setScale(0.05, 0.05);
+                this.add.image(20, 114, 'paper').setScale(0.3, 0.3);
+
+
                 this.gameObjects.scissor = this.physics.add.group({
                     key: 'scissor',
-                    repeat: this.objectNumbers,
-                    setXY: { x: 200, y: 200, stepX: 20 },
-                    setScale: { x: 0.05, y: 0.05 }
+                    quantity: this.OBJECT_QUANTITY ,
+                    setXY: { x: 200, y: 200, stepX: 100 },
+                    setScale: { x: 0.1, y: 0.1 }
                 });
                 this.gameObjects.scissor.children.iterate((child) => {
                     let directions = [-1, 1];
@@ -57,9 +72,9 @@
 
                 this.gameObjects.stone = this.physics.add.group({
                     key: 'stone',
-                    repeat: this.objectNumbers,
-                    setXY: { x: config.width - 200, y: config.height - 200, stepX: -20 },
-                    setScale: { x: 0.05, y: 0.05 }
+                    quantity: this.OBJECT_QUANTITY,
+                    setXY: { x: config.width - 200, y: config.height - 200, stepX: -100 },
+                    setScale: { x: 0.1, y: 0.1 }
                 });
                 this.gameObjects.stone.children.iterate((child) => {
                     let directions = [-1, 1];
@@ -73,9 +88,9 @@
 
                 this.gameObjects.paper = this.physics.add.group({
                     key: 'paper',
-                    repeat: this.objectNumbers,
-                    setXY: { x: 200, y: config.height - 200, stepX: 20 },
-                    setScale: { x: 0.3, y: 0.3 }
+                    quantity: this.OBJECT_QUANTITY,
+                    setXY: { x: 200, y: config.height - 200, stepX: 100 },
+                    setScale: { x: 0.5, y: 0.5 }
                 });
                 this.gameObjects.paper.children.iterate((child) => {
                     let directions = [-1, 1];
@@ -86,18 +101,17 @@
                     child.body.drag = 0;
                     child.setData('name', 'paper');
                 });
+                this.cursors = this.input.keyboard.createCursorKeys();
 
-                //this.cursors = this.input.keyboard.createCursorKeys();
-
-                // player = this.physics.add.sprite(500, 500, 'paper');
-                // gameObjects.paper.add(player, true);
-                // player.setData('name', 'paper');
-                // player.setData('isPlayer', true);
-                // player.setBounce(1);
-                // player.setCollideWorldBounds(true);
-                // player.setTexture('paper');
-                // player.setScale(0.3, 0.3);
-                // player.postFX.addGlow(0xffAAff, 4, 0, false, 0.1, 40);
+                // this.player = this.physics.add.sprite(500, 500, 'paper');
+                // this.gameObjects.paper.add(this.player, true);
+                // this.player.setData('name', 'paper');
+                // this.player.setData('isPlayer', true);
+                // this.player.setBounce(1);
+                // this.player.setCollideWorldBounds(true);
+                // this.player.setTexture('paper');
+                // this.player.setScale(0.3, 0.3);
+                // this.player.postFX.addGlow(0xffAAff, 4, 0, false, 0.1, 40);
 
                 this.drawBattleBorder();
                 this.physics.add.collider(this.gameObjects.stone, this.gameObjects.scissor, this.objectCollide, null, this)
@@ -106,31 +120,37 @@
 
             }
 
-            update() {
+            update(delta) {
+
+                if (this.gameOver) {
+                    return;
+                }
+
+                this.renderScore();
                 let isIdle = true;
 
-                // if (cursors.left.isDown) {
+                // if (this.cursors.left.isDown) {
                 //     isIdle = false;
-                //     player.setVelocityX(-160);
+                //     this.player.setVelocityX(-160);
                 // }
 
-                // if (cursors.right.isDown) {
+                // if (this.cursors.right.isDown) {
                 //     isIdle = false;
-                //     player.setVelocityX(160);
-                // } 
-
-                // if(cursors.down.isDown) {
-                //     isIdle = false;
-                //     player.setVelocityY(160);
-                // } 
-
-                // if(cursors.up.isDown){
-                //     isIdle = false;
-                //     player.setVelocityY(-160);
+                //     this.player.setVelocityX(160);
                 // }
 
-                // if (isIdle){
-                //     player.setVelocity(0,0);
+                // if (this.cursors.down.isDown) {
+                //     isIdle = false;
+                //     this.player.setVelocityY(160);
+                // }
+
+                // if (this.cursors.up.isDown) {
+                //     isIdle = false;
+                //     this.player.setVelocityY(-160);
+                // }
+
+                // if (isIdle) {
+                //     this.player.setVelocity(0, 0);
                 // }
             }
 
@@ -161,6 +181,12 @@
                 loserObject.destroy();
 
                 winnerObject.body.setVelocity(winnerObjectVelocity.x, winnerObjectVelocity.y);
+            }
+
+            renderScore() {
+                this.scissorScoreText.setText(this.gameObjects.scissor.getLength());
+                this.stoneScoreText.setText(this.gameObjects.stone.getLength());
+                this.paperScoreText.setText(this.gameObjects.paper.getLength());
             }
 
             calcDuelWinner(objectNameA, objectNameB) {
@@ -194,16 +220,16 @@
                 let rect = Phaser.Geom.Rectangle.Clone(this.cameras.main);
                 let { x, y, width, height } = rect;
 
-                
+
                 let battleBorder = this.add.rectangle(width / 2, height / 2, width - 200, height - 200);
-                battleBorder.setStrokeStyle(4,"0xFF0000");
+                battleBorder.setStrokeStyle(4, "0xFF0000");
                 this.syncWorldBounds(battleBorder);
                 this.tweens.add({
                     targets: battleBorder,
-                    scale: 0.4,
-                    duration: 15000,
+                    scale: 0.3,
+                    duration: 30000,
                     ease: 'linear',
-                    onUpdate: (tween, target, param) =>{
+                    onUpdate: (tween, target, param) => {
                         this.syncWorldBounds(target);
                     }
 
@@ -213,9 +239,29 @@
                 this.physics.add.collider(battleBorder, this.gameObjects.stone);
             }
 
-            syncWorldBounds(battleBorder){
+            syncWorldBounds(battleBorder) {
                 let rectRealBounds = battleBorder.getBounds();
                 this.physics.world.setBounds(rectRealBounds.x, rectRealBounds.y, rectRealBounds.width, rectRealBounds.height);
+            }
+
+            checkGameFinished() {
+                let winnerName;               
+                for(const [key, group] of Object.entries(this.gameObjects)) {
+                    isOver = group.getLength() === this.OBJECT_QUANTITY;
+                    if (isOver) {
+                        winnerName = key;
+                    }
+                };
+                this.gameOver = isOver;
+                this.showWinner(winnerName);
+            }
+
+            showWinner(winnerName) {
+                this.gameOverGroup = this.add.group();
+                let gameOverText = this.add.text(config.width / 2, config.height / 2, 'Winner');
+                let icon = this.add.image(config.width / 2, config.height / 2 + 20, winnerName);
+
+                this.gameOverGroup.add(gameOverText).add(icon);
             }
 
         }
@@ -227,7 +273,6 @@
             width: 1920,
             height: 1080,
             pixelArt: true,
-            debug: true,
             physics: {
                 default: 'arcade',
                 arcade: {
