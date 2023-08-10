@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 
-import Game from './scenes/Game';
+import Battle from './scenes/Battle';
 
 const config = {
     type: Phaser.AUTO,
@@ -18,6 +18,6 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
     },
-    scene: [Game]
+    scene: [Battle]
 };
 export default new Phaser.Game(config);
