@@ -28,8 +28,8 @@ export default class Battle extends Phaser.Scene {
     }
 
     create() {
-        this.center = {x: this.cameras.main.centerX, y: this.cameras.main.centerY}
-        this.screen = {width: this.cameras.main.width, height: this.cameras.main.height}
+        this.center = { x: this.cameras.main.centerX, y: this.cameras.main.centerY }
+        this.screen = { width: this.cameras.main.width, height: this.cameras.main.height }
         let background = this.add.image(this.center.x, this.center.y, 'table');
         background.displayWidth = this.screen.width;
         background.displayHeight = this.screen.height;
@@ -100,7 +100,7 @@ export default class Battle extends Phaser.Scene {
         // this.player.setCollideWorldBounds(true);
         // this.player.setTexture('paper');
         // this.player.setScale(0.3, 0.3);
-        // this.player.postFX.addGlow(0xffAAff, 4, 0, false, 0.1, 40);
+        //this.player.postFX.addGlow(0xffAAff, 4, 0, false, 0.1, 40);
 
         this.drawBattleBorder();
         this.physics.add.collider(this.gameObjects.stone, this.gameObjects.scissor, this.objectCollide, null, this)
@@ -110,35 +110,6 @@ export default class Battle extends Phaser.Scene {
 
     update(delta) {
 
-        if (this.gameOver) {
-            return;
-        }
-
-        let isIdle = true;
-
-        // if (this.cursors.left.isDown) {
-        //     isIdle = false;
-        //     this.player.setVelocityX(-160);
-        // }
-
-        // if (this.cursors.right.isDown) {
-        //     isIdle = false;
-        //     this.player.setVelocityX(160);
-        // }
-
-        // if (this.cursors.down.isDown) {
-        //     isIdle = false;
-        //     this.player.setVelocityY(160);
-        // }
-
-        // if (this.cursors.up.isDown) {
-        //     isIdle = false;
-        //     this.player.setVelocityY(-160);
-        // }
-
-        // if (isIdle) {
-        //     this.player.setVelocity(0, 0);
-        // }
     }
 
     objectCollide(objectA, objectB, info) {
