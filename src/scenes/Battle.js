@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import CountdownController from './CountdownController';
 
 export default class Battle extends Phaser.Scene {
 
@@ -23,8 +24,6 @@ export default class Battle extends Phaser.Scene {
         this.battleBorderTween;
         this.center;
         this.screen;
-        //this.player;
-        //this.cursors;
     }
 
     create() {
@@ -92,24 +91,12 @@ export default class Battle extends Phaser.Scene {
         });
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        // this.player = this.physics.add.sprite(500, 500, 'paper');
-        // this.gameObjects.paper.add(this.player, true);
-        // this.player.setData('name', 'paper');
-        // this.player.setData('isPlayer', true);
-        // this.player.setBounce(1);
-        // this.player.setCollideWorldBounds(true);
-        // this.player.setTexture('paper');
-        // this.player.setScale(0.3, 0.3);
-        //this.player.postFX.addGlow(0xffAAff, 4, 0, false, 0.1, 40);
-
         this.drawBattleBorder();
         this.physics.add.collider(this.gameObjects.stone, this.gameObjects.scissor, this.objectCollide, null, this)
         this.physics.add.collider(this.gameObjects.stone, this.gameObjects.paper, this.objectCollide, null, this)
         this.physics.add.collider(this.gameObjects.paper, this.gameObjects.scissor, this.objectCollide, null, this)
-    }
-
-    update(delta) {
-
+        this.freezeGame();
+        this.startCountdown();
     }
 
     objectCollide(objectA, objectB, info) {
@@ -219,8 +206,7 @@ export default class Battle extends Phaser.Scene {
         if (isOver) {
             console.log("GAME OVER - " + winnerName);
             this.gameOver = isOver;
-            this.physics.world.disable([this.gameObjects.paper, this.gameObjects.scissor, this.gameObjects.stone]);
-            this.battleBorderTween.stop();
+            this.freezeGame();
             this.showWinner(winnerName);
         }
     }
@@ -253,4 +239,32 @@ export default class Battle extends Phaser.Scene {
         this.scene.start();
     }
 
+    freezeGame() {
+        this.physics.world.disable([this.gameObjects.paper, this.gameObjects.scissor, this.gameObjects.stone]);
+        this.battleBorderTween.pause();
+    }
+
+    unfreezeGame() {
+        this.physics.world.enable([this.gameObjects.paper, this.gameObjects.scissor, this.gameObjects.stone]);
+        this.battleBorderTween.resume();
+    }
+
+    startCountdown() {
+        const countdownDuration = 3000;
+        let countdownText = this.add.text(this.center.x, this.center.y, (countdownDuration / 1000).toString(), { fontFamily: 'Arial Black', fontSize: 200 }).setOrigin(0.5)
+        new CountdownController(this, countdownText).start(countdownDuration, () => {
+            countdownText.text = "GO!"
+            this.add.tween({
+                targets: [countdownText],
+                scale: 0.03,
+                duration: 500,
+                onComplete: () => {
+                    this.unfreezeGame();
+                    countdownText.destroy();
+                },
+            })
+
+        })
+
+    }
 }

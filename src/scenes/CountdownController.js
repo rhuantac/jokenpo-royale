@@ -1,36 +1,34 @@
-export default class CountdownController 
-{
-    constructor(scene, label) {
-        this.scene = scene;
-        this.label = label;
-    }
+export default class CountdownController {
+	constructor(scene, label) {
+		this.scene = scene;
+		this.label = label;
+	}
 
-    start(callback, duration = 45000)
-	{
+	start(duration, finishedCallback) {
 		this.stop()
 
-		this.finishedCallback = callback
-		this.duration = duration
+		this.finishedCallback = finishedCallback
+		this.remainingTime = duration;
 
 		this.timerEvent = this.scene.time.addEvent({
-			delay: duration,
+			delay: 1000,
+			repeat: duration / 1000,
 			callback: () => {
-				this.label.text = '0'
-
-				this.stop()
+				this.remainingTime -= 1000;
+				this.label.text = this.remainingTime / 1000;
 				
-				if (callback)
-				{
-					callback()
+				if (this.remainingTime <= 0) {
+					if (this.finishedCallback) {
+						this.finishedCallback()
+					}
+					this.stop();
 				}
 			}
 		})
 	}
-    
-    stop()
-	{
-		if (this.timerEvent)
-		{
+
+	stop() {
+		if (this.timerEvent) {
 			this.timerEvent.destroy()
 			this.timerEvent = undefined
 		}

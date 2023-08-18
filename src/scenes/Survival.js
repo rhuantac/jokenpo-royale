@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import CountdownController from './CountdownController';
 
 export default class Survival extends Phaser.Scene {
 
@@ -34,10 +35,6 @@ export default class Survival extends Phaser.Scene {
         background.displayWidth = this.screen.width;
         background.displayHeight = this.screen.height;
 
-        this.add.image(20, 14, 'scissor').setScale(0.3, 0.3);        
-        this.add.image(20, 114, 'paper').setScale(0.3, 0.3);
-
-
         this.gameObjects.scissor = this.physics.add.group({
             key: 'scissor',
             quantity: this.OBJECT_QUANTITY,
@@ -67,7 +64,9 @@ export default class Survival extends Phaser.Scene {
         this.player.setScale(0.5, 0.5);
 
         this.drawBattleBorder();
-        this.physics.add.collider(this.gameObjects.paper, this.gameObjects.scissor, this.objectCollide, null, this)
+        this.physics.add.collider(this.gameObjects.paper, this.gameObjects.scissor, this.objectCollide, null, this);
+        this.freezeGame();
+        this.startCountdown();
     }
 
     update(delta) {
@@ -192,6 +191,35 @@ export default class Survival extends Phaser.Scene {
     restartGame() {
         this.scene.start();
         this.gameOver = false;
+    }
+
+    freezeGame() {
+        this.physics.world.disable([this.gameObjects.paper, this.gameObjects.scissor]);
+        this.battleBorderTween.pause();
+    }
+
+    unfreezeGame() {
+        this.physics.world.enable([this.gameObjects.paper, this.gameObjects.scissor]);
+        this.battleBorderTween.resume();
+    }
+
+    startCountdown() {
+        const countdownDuration = 3000;
+        let countdownText = this.add.text(this.center.x, this.center.y, (countdownDuration / 1000).toString(), { fontFamily: 'Arial Black', fontSize: 200 }).setOrigin(0.5)
+        new CountdownController(this, countdownText).start(countdownDuration, () => {
+            countdownText.text = "GO!"
+            this.add.tween({
+                targets: [countdownText],
+                scale: 0.03,
+                duration: 500,
+                onComplete: () => {
+                    this.unfreezeGame();
+                    countdownText.destroy();
+                },
+            })
+
+        })
+
     }
 
 }
