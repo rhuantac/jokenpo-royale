@@ -191,6 +191,7 @@ export default class Survival extends Phaser.Scene {
 
     restartGame() {
         this.scene.start();
+        this.gameOver = false;
     }
 
 }

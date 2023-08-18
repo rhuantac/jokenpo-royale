@@ -19,6 +19,6 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
     },
-    scene: [Survival]
+    scene: [Battle]
 };
 export default new Phaser.Game(config);
