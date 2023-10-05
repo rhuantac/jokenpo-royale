@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 
 import Battle from './scenes/Battle';
 import Survival from './scenes/Survival';
+import Menu from './scenes/Menu';
 
 const config = {
     type: Phaser.AUTO,
@@ -13,12 +14,12 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0, x: 0 },
-            debug: false
+            debug: true
         }
     },
     scale: {
         mode: Phaser.Scale.FIT,
     },
-    scene: [Battle]
+    scene: [Menu, Battle, Survival]
 };
 export default new Phaser.Game(config);

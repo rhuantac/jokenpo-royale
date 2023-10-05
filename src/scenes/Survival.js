@@ -11,7 +11,7 @@ export default class Survival extends Phaser.Scene {
     }
 
     constructor() {
-        super('Battle');
+        super('Survival');
         this.OBJECT_QUANTITY = 20;
         let scissor, stone, paper;
         this.gameObjects = { scissor, paper };
@@ -48,9 +48,10 @@ export default class Survival extends Phaser.Scene {
             child.setCollideWorldBounds(true);
             child.setVelocity(Phaser.Math.Between(100, 200) * directions[directionIndex], Phaser.Math.Between(100, 200) * directions[directionIndex]);
             child.body.drag = 0;
+            child.body.setSize(80, 80)
             child.setData('name', 'scissor');
         });
-        
+
         this.gameObjects.paper = this.physics.add.group();
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -62,6 +63,7 @@ export default class Survival extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.player.setTexture('paper');
         this.player.setScale(0.5, 0.5);
+        this.player.body.setSize(90, 60)
 
         this.drawBattleBorder();
         this.physics.add.collider(this.gameObjects.paper, this.gameObjects.scissor, this.objectCollide, null, this);
@@ -108,6 +110,7 @@ export default class Survival extends Phaser.Scene {
         this.physics.world.disable([this.gameObjects.paper, this.gameObjects.scissor]);
         this.battleBorderTween.stop();
         this.showLoseMsg();
+
     }
 
     calcDuelWinner(objectNameA, objectNameB) {

@@ -55,6 +55,7 @@ export default class Battle extends Phaser.Scene {
             child.setCollideWorldBounds(true);
             child.setVelocity(Phaser.Math.Between(100, 200) * directions[directionIndex], Phaser.Math.Between(100, 200) * directions[directionIndex]);
             child.body.drag = 0;
+            child.body.setSize(80, 80)
             child.setData('name', 'scissor');
         });
 
@@ -71,6 +72,7 @@ export default class Battle extends Phaser.Scene {
             child.setCollideWorldBounds(true);
             child.setVelocity(Phaser.Math.Between(100, 200) * directions[directionIndex], Phaser.Math.Between(100, 200) * directions[directionIndex]);
             child.body.drag = 0;
+            child.body.setSize(90, 60)
             child.setData('name', 'stone');
         });
 
@@ -87,6 +89,7 @@ export default class Battle extends Phaser.Scene {
             child.setCollideWorldBounds(true);
             child.setVelocity(Phaser.Math.Between(100, 200) * directions[directionIndex], Phaser.Math.Between(100, 200) * directions[directionIndex]);
             child.body.drag = 0;
+            child.body.setSize(90, 60)
             child.setData('name', 'paper');
         });
         this.cursors = this.input.keyboard.createCursorKeys();
