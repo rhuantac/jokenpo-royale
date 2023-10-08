@@ -24,8 +24,7 @@ export default class Survival extends Phaser.Scene {
         this.battleBorderTween;
         this.center;
         this.screen;
-        //this.player;
-        //this.cursors;
+        this.winCountdown;
     }
 
     create() {
@@ -106,11 +105,15 @@ export default class Survival extends Phaser.Scene {
     }
 
     objectCollide() {
+        this.endGame();
+        this.showLoseMsg();
+    }
+
+    endGame() {
         this.gameOver = true;
         this.physics.world.disable([this.gameObjects.paper, this.gameObjects.scissor]);
         this.battleBorderTween.stop();
-        this.showLoseMsg();
-
+        this.stopWinCountdown();
     }
 
     calcDuelWinner(objectNameA, objectNameB) {
@@ -151,7 +154,7 @@ export default class Survival extends Phaser.Scene {
         this.battleBorderTween = this.tweens.add({
             targets: battleBorder,
             scale: 0.3,
-            duration: 30000,
+            duration: 45000,
             ease: 'linear',
             onUpdate: (tween, target, param) => {
                 this.syncWorldBounds(target);
@@ -171,12 +174,29 @@ export default class Survival extends Phaser.Scene {
     showLoseMsg() {
         this.gameOverGroup = this.add.group();
         let gameOverText = this.add.text(this.center.x, 70, 'You lose', { fontFamily: 'Arial Black', fontSize: 80, color: '#CC0000' }).setOrigin(0.5);
-        let playAgainButton = this.add.text(this.center.x, this.screen.height - 100, 'Play again', { fontFamily: 'Arial Black', fontSize: 70 }).setOrigin(0.5);
+        this.showEndMenu(gameOverText);        
+    }
+
+    showWinMsg() {
+        this.gameOverGroup = this.add.group();
+        let gameOverText = this.add.text(this.center.x, 70, 'You win', { fontFamily: 'Arial Black', fontSize: 80, color: '#00CC00' }).setOrigin(0.5);
+        this.showEndMenu(gameOverText);        
+    }
+
+    showEndMenu(gameOverText) {
+        let playAgainButton = this.add.text(this.center.x - 300, this.screen.height - 100, 'Play again', { fontFamily: 'Arial Black', fontSize: 70 }).setOrigin(0.5);
         playAgainButton.setInteractive({ useHandCursor: true });
         playAgainButton
             .on('pointerdown', this.restartGame.bind(this))
             .on('pointerover', () => playAgainButton.setStyle({ fill: '#90EE90' }))
             .on('pointerout', () => playAgainButton.setStyle({ fill: '#FFF' }))
+
+        let menuButton = this.add.text(this.center.x + 300, this.screen.height - 100, 'Main menu', { fontFamily: 'Arial Black', fontSize: 70 }).setOrigin(0.5);
+        menuButton.setInteractive({ useHandCursor: true });
+        menuButton
+            .on('pointerdown', () => this.scene.start('Menu'))
+            .on('pointerover', () => menuButton.setStyle({ fill: '#90EE90' }))
+            .on('pointerout', () => menuButton.setStyle({ fill: '#FFF' }))
 
 
         this.add.tween({
@@ -187,8 +207,7 @@ export default class Survival extends Phaser.Scene {
             repeat: -1
         });
 
-        this.gameOverGroup.add(gameOverText).add(playAgainButton);
-
+        this.gameOverGroup.add(gameOverText).add(menuButton);
     }
 
     restartGame() {
@@ -207,7 +226,7 @@ export default class Survival extends Phaser.Scene {
     }
 
     startCountdown() {
-        const countdownDuration = 3000;
+        const countdownDuration = 30000;
         let countdownText = this.add.text(this.center.x, this.center.y, (countdownDuration / 1000).toString(), { fontFamily: 'Arial Black', fontSize: 200 }).setOrigin(0.5)
         new CountdownController(this, countdownText).start(countdownDuration, () => {
             countdownText.text = "GO!"
@@ -218,11 +237,25 @@ export default class Survival extends Phaser.Scene {
                 onComplete: () => {
                     this.unfreezeGame();
                     countdownText.destroy();
+                    this.startWinCountdown();
                 },
             })
 
         })
+    }
 
+    startWinCountdown() {
+        const countdownDuration = 1000;
+        this.winCountdownText = this.add.text(this.center.x, 70, (countdownDuration / 1000).toString(), { fontFamily: 'Arial Black', fontSize: 150 }).setOrigin(0.5)
+        this.winCountdown = new CountdownController(this, this.winCountdownText).start(countdownDuration, () => {
+            this.endGame();
+            this.showWinMsg();
+        })
+    }
+
+    stopWinCountdown() {
+        this.winCountdown.stop();
+        this.winCountdownText.destroy();
     }
 
 }

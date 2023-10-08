@@ -45,7 +45,7 @@ export default class Battle extends Phaser.Scene {
         this.gameObjects.scissor = this.physics.add.group({
             key: 'scissor',
             quantity: this.OBJECT_QUANTITY,
-            setXY: { x: 200, y: 200, stepX: 100 },
+            setXY: { x: 200, y: 200, stepX: 50 },
             setScale: { x: 0.5, y: 0.5 }
         });
         this.gameObjects.scissor.children.iterate((child) => {
@@ -62,7 +62,7 @@ export default class Battle extends Phaser.Scene {
         this.gameObjects.stone = this.physics.add.group({
             key: 'stone',
             quantity: this.OBJECT_QUANTITY,
-            setXY: { x: this.screen.width - 200, y: this.screen.height - 200, stepX: -100 },
+            setXY: { x: this.screen.width - 100, y: this.screen.height - 200, stepX: -50 },
             setScale: { x: 0.5, y: 0.5 }
         });
         this.gameObjects.stone.children.iterate((child) => {
@@ -79,7 +79,7 @@ export default class Battle extends Phaser.Scene {
         this.gameObjects.paper = this.physics.add.group({
             key: 'paper',
             quantity: this.OBJECT_QUANTITY,
-            setXY: { x: 200, y: this.screen.height - 200, stepX: 100 },
+            setXY: { x: 200, y: this.screen.height - 200, stepX: 50 },
             setScale: { x: 0.5, y: 0.5 }
         });
         this.gameObjects.paper.children.iterate((child) => {
@@ -218,14 +218,20 @@ export default class Battle extends Phaser.Scene {
         this.gameOverGroup = this.add.group();
         let gameOverText = this.add.text(this.center.x, 70, 'Winner', { fontFamily: 'Arial Black', fontSize: 80, shadowColor: '#F1F1A0', shadowBlur: 10, shadowFill: true }).setOrigin(0.5);
         let icon = this.add.image(this.center.x, 170, winnerName);
-        let playAgainButton = this.add.text(this.center.x, this.screen.height - 100, 'Play again', { fontFamily: 'Arial Black', fontSize: 70 }).setOrigin(0.5);
+        let playAgainButton = this.add.text(this.center.x - 300, this.screen.height - 100, 'Play again', { fontFamily: 'Arial Black', fontSize: 70 }).setOrigin(0.5);
         playAgainButton.setInteractive({ useHandCursor: true });
         playAgainButton
             .on('pointerdown', this.restartGame.bind(this))
             .on('pointerover', () => playAgainButton.setStyle({ fill: '#90EE90' }))
             .on('pointerout', () => playAgainButton.setStyle({ fill: '#FFF' }))
 
-
+        let menuButton = this.add.text(this.center.x + 300, this.screen.height - 100, 'Main menu', { fontFamily: 'Arial Black', fontSize: 70 }).setOrigin(0.5);
+        menuButton.setInteractive({ useHandCursor: true });
+        menuButton
+            .on('pointerdown', () => this.scene.start('Menu'))
+            .on('pointerover', () => menuButton.setStyle({ fill: '#90EE90' }))
+            .on('pointerout', () => menuButton.setStyle({ fill: '#FFF' }))
+            
         this.add.tween({
             targets: [gameOverText, icon],
             scale: 1.05,
