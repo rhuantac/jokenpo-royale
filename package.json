@@ -1,16 +1,19 @@
 {
-  "name": "jokenpo-royale",
-  "source": "src/index.html", 
-  "private": true,
+	"name": "jokenpo-royale",
+	"source": "src/index.html",
+	"homepage": "http://rhuantac.github.io/{repo-name}",
+	"private": true,
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
 		"start": "vite",
 		"build": "vite build",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"deploy": "gh-pages -d build"
 	},
 	"devDependencies": {
 		"eslint": "^8.25.0",
+		"gh-pages": "^6.0.0",
 		"vite": "^3.1.0"
 	},
 	"dependencies": {
