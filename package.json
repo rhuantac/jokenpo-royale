@@ -1,7 +1,7 @@
 {
 	"name": "jokenpo-royale",
 	"source": "src/index.html",
-	"homepage": "http://rhuantac.github.io/{repo-name}",
+	"homepage": "http://rhuantac.github.io/jokenpo-royale",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
