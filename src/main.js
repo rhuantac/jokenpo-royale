@@ -17,7 +17,7 @@ const config = {
         }
     },
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE
     },
     scene: [Menu, Battle, Survival]
 };
