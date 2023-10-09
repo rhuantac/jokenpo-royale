@@ -226,7 +226,7 @@ export default class Survival extends Phaser.Scene {
     }
 
     startCountdown() {
-        const countdownDuration = 30000;
+        const countdownDuration = 3000;
         let countdownText = this.add.text(this.center.x, this.center.y, (countdownDuration / 1000).toString(), { fontFamily: 'Arial Black', fontSize: 200 }).setOrigin(0.5)
         new CountdownController(this, countdownText).start(countdownDuration, () => {
             countdownText.text = "GO!"
@@ -245,7 +245,7 @@ export default class Survival extends Phaser.Scene {
     }
 
     startWinCountdown() {
-        const countdownDuration = 1000;
+        const countdownDuration = 30000;
         this.winCountdownText = this.add.text(this.center.x, 70, (countdownDuration / 1000).toString(), { fontFamily: 'Arial Black', fontSize: 150 }).setOrigin(0.5)
         this.winCountdown = new CountdownController(this, this.winCountdownText).start(countdownDuration, () => {
             this.endGame();
